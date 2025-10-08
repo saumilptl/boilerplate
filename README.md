@@ -133,7 +133,3 @@ npm run dev
 - ✅ Type-safe frontend and backend
 - ✅ Docker development environment
 - ✅ ngrok integration for webhooks and external access
-
-## License
-
-MIT

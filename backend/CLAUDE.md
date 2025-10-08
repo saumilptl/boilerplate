@@ -409,12 +409,73 @@ Full documentation in `docs/`:
 
 ## Known Patterns
 
-1. **Config access**: `from app.config import config; cfg = config()`
-2. **Database session**: `from app.infra.database.db import get_session`
-3. **Auth dependency**: `from app.auth.dependencies import current_user`
-4. **Logging**: `from app.infra.monitoring.logging.logger import logger`
-   - Use the global logger instance initialized by the DI container
-   - NEVER use `structlog.get_logger(__name__)` - this causes fragmentation
+```python
+# Repository Pattern
+from app.infra.database.repository import Repository
+from app.auth.models import User
+
+class UserRepository(Repository[User]):
+    model_class = User
+
+    async def get_by_email(self, email: str) -> User | None:
+        return await self.find_one_by_attributes(email=email)
+
+# Unit of Work Pattern (for transactions)
+from app.infra.database.unit_of_work import UnitOfWork
+
+@UnitOfWork.with_repositories(UserRepository, PostRepository)
+async def create_user_with_post(user_data, post_data, uow=None):
+    user_repo = uow.get_repository(UserRepository)
+    post_repo = uow.get_repository(PostRepository)
+
+    user = await user_repo.create(user_data)
+    post = await post_repo.create(post_data)
+    await uow.commit()
+    return user
+
+# Dependency Injection (FastAPI)
+from fastapi import Depends
+from app.auth.dependencies import current_active_user
+from app.auth.models import User
+
+@router.get("/protected")
+async def endpoint(user: User = Depends(current_active_user)):
+    ...
+
+# Database session (when not using UnitOfWork)
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.infra.database.db import get_session
+
+@router.get("/")
+async def simple_endpoint(session: AsyncSession = Depends(get_session)):
+    ...
+
+# Logging
+from app.infra.monitoring.logging.logger import logger
+logger.info("User created", extra={"user_id": str(user.id), "email": user.email})
+# NEVER use structlog.get_logger(__name__) - use the global logger instance
+
+# Dependency Injection for services needing config
+# Services receive config through the DI container, not direct imports
+
+# Example service with config injection
+from app.config import DatabaseConfig
+
+class MyService:
+    def __init__(self, db_config: DatabaseConfig):
+        self.db_config = db_config
+
+# In DI container (di.py)
+from dependency_injector import containers, providers
+
+class MyContainer(containers.DeclarativeContainer):
+    config = providers.Configuration()
+
+    my_service = providers.Factory(
+        MyService,
+        db_config=config.DATABASE,
+    )
+```
 
 ## What NOT to Do
 
@@ -425,3 +486,4 @@ Full documentation in `docs/`:
 - ❌ Don't add default values to required config fields
 - ❌ Don't modify Pydantic config to skip validation
 - ❌ Don't create models without `table=True` and `__tablename__`
+- ❌ Don't import config directly in services - use dependency injection from the container
