@@ -10,48 +10,48 @@ Tailwind CSS v4 uses a completely new syntax compared to v3.
 
 ```css
 /* Import Tailwind */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Custom variant for dark mode */
 @custom-variant dark (&:is(.dark *));
 
 /* CSS Variables */
 :root {
-    --radius: 0.5rem;
+	--radius: 0.5rem;
 
-    /* Colors (must use hsl() wrapper) */
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(240 10% 10%);
-    --primary: hsl(240 5.9% 10%);
-    --primary-foreground: hsl(0 0% 100%);
-    --muted: hsl(240 4.8% 95.9%);
-    --muted-foreground: hsl(240 3.8% 46.1%);
-    /* ... more colors */
+	/* Colors (must use hsl() wrapper) */
+	--background: hsl(0 0% 100%);
+	--foreground: hsl(240 10% 10%);
+	--primary: hsl(240 5.9% 10%);
+	--primary-foreground: hsl(0 0% 100%);
+	--muted: hsl(240 4.8% 95.9%);
+	--muted-foreground: hsl(240 3.8% 46.1%);
+	/* ... more colors */
 }
 
 /* CRITICAL: @theme inline directive */
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    /* ... more theme mappings */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	/* ... more theme mappings */
 
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
 }
 
 /* Base styles */
 @layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
 }
 ```
 
@@ -60,24 +60,24 @@ Tailwind CSS v4 uses a completely new syntax compared to v3.
 ```typescript
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';  // v4 Vite plugin
+import tailwindcss from '@tailwindcss/vite'; // v4 Vite plugin
 
 export default defineConfig({
-    plugins: [
-        tailwindcss(),  // Add before sveltekit
-        sveltekit()
-    ]
+	plugins: [
+		tailwindcss(), // Add before sveltekit
+		sveltekit()
+	]
 });
 ```
 
 ### Key Differences from v3
 
-| v3 | v4 |
-|----|-----|
-| `@tailwind base;` | `@import "tailwindcss";` |
+| v3                   | v4                         |
+| -------------------- | -------------------------- |
+| `@tailwind base;`    | `@import "tailwindcss";`   |
 | `tailwind.config.js` | `@theme inline { }` in CSS |
-| No wrapper needed | `hsl()` wrapper required |
-| `@apply` anywhere | `@apply` only in `@layer` |
+| No wrapper needed    | `hsl()` wrapper required   |
+| `@apply` anywhere    | `@apply` only in `@layer`  |
 
 ### Common Classes
 
@@ -120,6 +120,7 @@ npx shadcn-svelte@next init
 ```
 
 This creates:
+
 - `components.json` - Configuration
 - `lib/components/ui/` - Component directory
 - Updates `app.css` with CSS variables
@@ -145,20 +146,20 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import * as Card from '$lib/components/ui/card';
+	import * as Card from '$lib/components/ui/card';
 </script>
 
 <Card.Root>
-    <Card.Header>
-        <Card.Title>Card Title</Card.Title>
-        <Card.Description>Card description text</Card.Description>
-    </Card.Header>
-    <Card.Content>
-        <!-- Main content -->
-    </Card.Content>
-    <Card.Footer>
-        <!-- Footer content -->
-    </Card.Footer>
+	<Card.Header>
+		<Card.Title>Card Title</Card.Title>
+		<Card.Description>Card description text</Card.Description>
+	</Card.Header>
+	<Card.Content>
+		<!-- Main content -->
+	</Card.Content>
+	<Card.Footer>
+		<!-- Footer content -->
+	</Card.Footer>
 </Card.Root>
 ```
 
@@ -166,7 +167,7 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <!-- Variants -->
@@ -182,7 +183,7 @@ Components use a **compound pattern**:
 <Button size="default">Default</Button>
 <Button size="lg">Large</Button>
 <Button size="icon">
-    <Icon />
+	<Icon />
 </Button>
 
 <!-- States -->
@@ -194,24 +195,22 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import * as Card from '$lib/components/ui/card';
-    import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <Card.Root>
-    <Card.Header>
-        <Card.Title>Create Account</Card.Title>
-        <Card.Description>
-            Enter your details to create a new account
-        </Card.Description>
-    </Card.Header>
-    <Card.Content class="space-y-4">
-        <!-- Form fields -->
-    </Card.Content>
-    <Card.Footer class="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Submit</Button>
-    </Card.Footer>
+	<Card.Header>
+		<Card.Title>Create Account</Card.Title>
+		<Card.Description>Enter your details to create a new account</Card.Description>
+	</Card.Header>
+	<Card.Content class="space-y-4">
+		<!-- Form fields -->
+	</Card.Content>
+	<Card.Footer class="flex justify-between">
+		<Button variant="outline">Cancel</Button>
+		<Button>Submit</Button>
+	</Card.Footer>
 </Card.Root>
 ```
 
@@ -219,21 +218,15 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import { Input } from '$lib/components/ui/input';
-    import { Label } from '$lib/components/ui/label';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 
-    let email = $state('');
+	let email = $state('');
 </script>
 
 <div class="grid gap-2">
-    <Label for="email">Email</Label>
-    <Input
-        id="email"
-        type="email"
-        placeholder="you@example.com"
-        bind:value={email}
-        required
-    />
+	<Label for="email">Email</Label>
+	<Input id="email" type="email" placeholder="you@example.com" bind:value={email} required />
 </div>
 ```
 
@@ -241,35 +234,33 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import * as Dialog from '$lib/components/ui/dialog';
-    import { Button } from '$lib/components/ui/button';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Button } from '$lib/components/ui/button';
 
-    let open = $state(false);
+	let open = $state(false);
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Trigger asChild let:builder>
-        <Button builders={[builder]}>Open Dialog</Button>
-    </Dialog.Trigger>
-    <Dialog.Content>
-        <Dialog.Header>
-            <Dialog.Title>Confirm Action</Dialog.Title>
-            <Dialog.Description>
-                Are you sure you want to continue?
-            </Dialog.Description>
-        </Dialog.Header>
-        <Dialog.Footer>
-            <Button variant="outline" onclick={() => open = false}>
-                Cancel
-            </Button>
-            <Button onclick={() => {
-                // Handle confirm
-                open = false;
-            }}>
-                Confirm
-            </Button>
-        </Dialog.Footer>
-    </Dialog.Content>
+	<Dialog.Trigger asChild let:builder>
+		<Button builders={[builder]}>Open Dialog</Button>
+	</Dialog.Trigger>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Confirm Action</Dialog.Title>
+			<Dialog.Description>Are you sure you want to continue?</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
+			<Button
+				onclick={() => {
+					// Handle confirm
+					open = false;
+				}}
+			>
+				Confirm
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
 </Dialog.Root>
 ```
 
@@ -277,30 +268,22 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-    import { Button } from '$lib/components/ui/button';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <DropdownMenu.Root>
-    <DropdownMenu.Trigger asChild let:builder>
-        <Button variant="outline" builders={[builder]}>
-            Options
-        </Button>
-    </DropdownMenu.Trigger>
-    <DropdownMenu.Content>
-        <DropdownMenu.Label>My Account</DropdownMenu.Label>
-        <DropdownMenu.Separator />
-        <DropdownMenu.Item onclick={() => console.log('Profile')}>
-            Profile
-        </DropdownMenu.Item>
-        <DropdownMenu.Item onclick={() => console.log('Settings')}>
-            Settings
-        </DropdownMenu.Item>
-        <DropdownMenu.Separator />
-        <DropdownMenu.Item onclick={() => console.log('Logout')}>
-            Logout
-        </DropdownMenu.Item>
-    </DropdownMenu.Content>
+	<DropdownMenu.Trigger asChild let:builder>
+		<Button variant="outline" builders={[builder]}>Options</Button>
+	</DropdownMenu.Trigger>
+	<DropdownMenu.Content>
+		<DropdownMenu.Label>My Account</DropdownMenu.Label>
+		<DropdownMenu.Separator />
+		<DropdownMenu.Item onclick={() => console.log('Profile')}>Profile</DropdownMenu.Item>
+		<DropdownMenu.Item onclick={() => console.log('Settings')}>Settings</DropdownMenu.Item>
+		<DropdownMenu.Separator />
+		<DropdownMenu.Item onclick={() => console.log('Logout')}>Logout</DropdownMenu.Item>
+	</DropdownMenu.Content>
 </DropdownMenu.Root>
 ```
 
@@ -311,33 +294,35 @@ Components use a **compound pattern**:
 ```svelte
 <!-- lib/components/UserAvatar.svelte -->
 <script lang="ts">
-    type UserAvatarProps = {
-        name: string;
-        email?: string;
-        size?: 'sm' | 'md' | 'lg';
-    };
+	type UserAvatarProps = {
+		name: string;
+		email?: string;
+		size?: 'sm' | 'md' | 'lg';
+	};
 
-    let { name, email, size = 'md' }: UserAvatarProps = $props();
+	let { name, email, size = 'md' }: UserAvatarProps = $props();
 
-    const sizeClasses = {
-        sm: 'h-8 w-8 text-xs',
-        md: 'h-10 w-10 text-sm',
-        lg: 'h-12 w-12 text-base'
-    };
+	const sizeClasses = {
+		sm: 'h-8 w-8 text-xs',
+		md: 'h-10 w-10 text-sm',
+		lg: 'h-12 w-12 text-base'
+	};
 
-    const initials = name
-        .split(' ')
-        .map(n => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+	const initials = name
+		.split(' ')
+		.map((n) => n[0])
+		.join('')
+		.toUpperCase()
+		.slice(0, 2);
 </script>
 
 <div
-    class="flex items-center justify-center rounded-full bg-primary text-primary-foreground {sizeClasses[size]}"
-    title={email}
+	class="bg-primary text-primary-foreground flex items-center justify-center rounded-full {sizeClasses[
+		size
+	]}"
+	title={email}
 >
-    {initials}
+	{initials}
 </div>
 ```
 
@@ -345,7 +330,7 @@ Components use a **compound pattern**:
 
 ```svelte
 <script lang="ts">
-    import UserAvatar from '$lib/components/UserAvatar.svelte';
+	import UserAvatar from '$lib/components/UserAvatar.svelte';
 </script>
 
 <UserAvatar name="John Doe" email="john@example.com" size="lg" />
@@ -358,17 +343,17 @@ Components use a **compound pattern**:
 ```svelte
 <!-- Centered container -->
 <div class="container mx-auto max-w-4xl p-6">
-    <!-- Content -->
+	<!-- Content -->
 </div>
 
 <!-- Full-height centered -->
 <div class="flex min-h-screen items-center justify-center">
-    <!-- Centered content -->
+	<!-- Centered content -->
 </div>
 
 <!-- Grid layout -->
 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    <!-- Grid items -->
+	<!-- Grid items -->
 </div>
 ```
 
@@ -376,11 +361,11 @@ Components use a **compound pattern**:
 
 ```svelte
 <form class="space-y-4">
-    <div class="grid gap-2">
-        <Label for="field">Label</Label>
-        <Input id="field" />
-    </div>
-    <Button type="submit" class="w-full">Submit</Button>
+	<div class="grid gap-2">
+		<Label for="field">Label</Label>
+		<Input id="field" />
+	</div>
+	<Button type="submit" class="w-full">Submit</Button>
 </form>
 ```
 
@@ -388,9 +373,9 @@ Components use a **compound pattern**:
 
 ```svelte
 {#if loading}
-    <div class="flex items-center justify-center p-6">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
+	<div class="flex items-center justify-center p-6">
+		<div class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
+	</div>
 {/if}
 ```
 
@@ -398,9 +383,9 @@ Components use a **compound pattern**:
 
 ```svelte
 {#if error}
-    <div class="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-        {error}
-    </div>
+	<div class="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
+		{error}
+	</div>
 {/if}
 ```
 
@@ -427,27 +412,27 @@ Components use a **compound pattern**:
 ```typescript
 // lib/state/theme.svelte.ts
 class ThemeState {
-    theme = $state<'light' | 'dark'>('light');
+	theme = $state<'light' | 'dark'>('light');
 
-    constructor() {
-        // Load from localStorage
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
-            this.theme = saved || 'light';
-        }
+	constructor() {
+		// Load from localStorage
+		if (typeof window !== 'undefined') {
+			const saved = localStorage.getItem('theme') as 'light' | 'dark' | null;
+			this.theme = saved || 'light';
+		}
 
-        // Sync to DOM and localStorage
-        $effect(() => {
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('theme', this.theme);
-                document.documentElement.classList.toggle('dark', this.theme === 'dark');
-            }
-        });
-    }
+		// Sync to DOM and localStorage
+		$effect(() => {
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('theme', this.theme);
+				document.documentElement.classList.toggle('dark', this.theme === 'dark');
+			}
+		});
+	}
 
-    toggle() {
-        this.theme = this.theme === 'light' ? 'dark' : 'light';
-    }
+	toggle() {
+		this.theme = this.theme === 'light' ? 'dark' : 'light';
+	}
 }
 
 export const themeState = new ThemeState();
@@ -459,11 +444,11 @@ In `app.css`:
 
 ```css
 .dark {
-    --background: hsl(240 10% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(240 5.9% 10%);
-    /* ... more dark colors */
+	--background: hsl(240 10% 3.9%);
+	--foreground: hsl(0 0% 98%);
+	--primary: hsl(0 0% 98%);
+	--primary-foreground: hsl(240 5.9% 10%);
+	/* ... more dark colors */
 }
 ```
 
@@ -471,16 +456,16 @@ In `app.css`:
 
 ```svelte
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
-    import { themeState } from '$lib/state/theme.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { themeState } from '$lib/state/theme.svelte';
 </script>
 
 <Button variant="ghost" size="icon" onclick={() => themeState.toggle()}>
-    {#if themeState.theme === 'light'}
-        🌙
-    {:else}
-        ☀️
-    {/if}
+	{#if themeState.theme === 'light'}
+		🌙
+	{:else}
+		☀️
+	{/if}
 </Button>
 ```
 

@@ -11,11 +11,12 @@ Production-ready fullstack monorepo with FastAPI backend and SvelteKit frontend.
 
 ### Backend Docs
 - [Backend Documentation](../backend/docs/README.md) - Complete backend documentation
-- [Backend CLAUDE.md](../backend/CLAUDE.md) - Backend AI assistant guidelines
 
 ### Frontend Docs
 - [Frontend Documentation](../frontend/docs/README.md) - Complete frontend documentation
-- [Frontend CLAUDE.md](../frontend/CLAUDE.md) - Frontend AI assistant guidelines
+
+### AI Assistant Guidelines
+- [Root CLAUDE.md](../CLAUDE.md) - Comprehensive AI development guidelines for both backend and frontend
 
 ## Quick Start
 
@@ -50,14 +51,12 @@ docker compose up
 │   ├── scripts/            # Utility scripts
 │   ├── secrets/            # EJSON secrets
 │   ├── docs/               # Backend documentation
-│   ├── CLAUDE.md           # Backend AI guidelines
 │   └── pyproject.toml      # Python dependencies
 │
 ├── frontend/               # SvelteKit frontend
 │   ├── src/                # Source code
 │   ├── static/             # Static assets
 │   ├── docs/               # Frontend documentation
-│   ├── CLAUDE.md           # Frontend AI guidelines
 │   └── package.json        # Node dependencies
 │
 ├── docs/                   # Monorepo documentation (you are here)

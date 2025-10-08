@@ -1,7 +1,6 @@
 :8080 {
-	# API routes - strip /api prefix and proxy to backend
+	# API routes - proxy to backend (keep /api prefix)
 	handle /api/* {
-		uri strip_prefix /api
 		reverse_proxy api:8000
 	}
 

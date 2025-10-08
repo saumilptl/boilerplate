@@ -110,24 +110,24 @@ import { AuthUserSchema } from '$lib/schemas/auth';
 import type { RegisterRequest } from '$lib/schemas/auth';
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
-    try {
-        const response = await api.get(ENDPOINTS.AUTH.ME);
-        return AuthUserSchema.parse(response);
-    } catch (error) {
-        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
-            return null;
-        }
-        throw error;
-    }
+	try {
+		const response = await api.get(ENDPOINTS.AUTH.ME);
+		return AuthUserSchema.parse(response);
+	} catch (error) {
+		if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
+			return null;
+		}
+		throw error;
+	}
 }
 
 export async function register(data: RegisterRequest): Promise<void> {
-    const validatedData = RegisterRequestSchema.parse(data);
-    await api.post(ENDPOINTS.AUTH.REGISTER, validatedData);
+	const validatedData = RegisterRequestSchema.parse(data);
+	await api.post(ENDPOINTS.AUTH.REGISTER, validatedData);
 }
 
 export async function logout(): Promise<void> {
-    await api.post(ENDPOINTS.AUTH.LOGOUT);
+	await api.post(ENDPOINTS.AUTH.LOGOUT);
 }
 ```
 
@@ -141,12 +141,12 @@ import { base } from '$app/paths';
 export const API_BASE_URL = PUBLIC_API_URL || `${base}/api`;
 
 export const ENDPOINTS = {
-    AUTH: {
-        LOGIN: '/auth/cookie/login',      // Cookie-based login
-        LOGOUT: '/auth/cookie/logout',    // Cookie-based logout
-        ME: '/auth/users/me',             // Get current user
-        REGISTER: '/auth/register'        // User registration
-    }
+	AUTH: {
+		LOGIN: '/auth/cookie/login', // Cookie-based login
+		LOGOUT: '/auth/cookie/logout', // Cookie-based logout
+		ME: '/auth/users/me', // Get current user
+		REGISTER: '/auth/register' // User registration
+	}
 } as const;
 ```
 
@@ -157,22 +157,22 @@ export const ENDPOINTS = {
 import { z } from 'zod';
 
 export const LoginRequestSchema = z.object({
-    username: z.string().email('Please enter a valid email'),
-    password: z.string().min(1, 'Password is required')
+	username: z.string().email('Please enter a valid email'),
+	password: z.string().min(1, 'Password is required')
 });
 
 export const RegisterRequestSchema = z.object({
-    email: z.string().email('Please enter a valid email'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    full_name: z.string().min(1, 'Full name is required')
+	email: z.string().email('Please enter a valid email'),
+	password: z.string().min(8, 'Password must be at least 8 characters'),
+	full_name: z.string().min(1, 'Full name is required')
 });
 
 export const AuthUserSchema = z.object({
-    id: z.string(),
-    email: z.string().email(),
-    full_name: z.string().optional(),
-    is_active: z.boolean(),
-    is_verified: z.boolean()
+	id: z.string(),
+	email: z.string().email(),
+	full_name: z.string().optional(),
+	is_active: z.boolean(),
+	is_verified: z.boolean()
 });
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
@@ -196,33 +196,33 @@ routes/
 
 ```svelte
 <script lang="ts">
-    import { authState } from '$lib/state/auth.svelte';
-    import { goto } from '$app/navigation';
-    import { base } from '$app/paths';
-    import { browser } from '$app/environment';
-    import { page } from '$app/stores';
+	import { authState } from '$lib/state/auth.svelte';
+	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
+	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 
-    let { children } = $props();
+	let { children } = $props();
 
-    // Client-side auth check
-    $effect(() => {
-        if (browser && !authState.loading && !authState.isAuthenticated) {
-            // Redirect to login with return URL
-            const redirectTo = encodeURIComponent($page.url.pathname + $page.url.search);
-            goto(`${base}/login?redirectTo=${redirectTo}`);
-        }
-    });
+	// Client-side auth check
+	$effect(() => {
+		if (browser && !authState.loading && !authState.isAuthenticated) {
+			// Redirect to login with return URL
+			const redirectTo = encodeURIComponent($page.url.pathname + $page.url.search);
+			goto(`${base}/login?redirectTo=${redirectTo}`);
+		}
+	});
 </script>
 
 {#if authState.isAuthenticated}
-    {@render children?.()}
+	{@render children?.()}
 {:else if authState.loading}
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p class="mt-2 text-sm text-muted-foreground">Loading...</p>
-        </div>
-    </div>
+	<div class="flex min-h-screen items-center justify-center">
+		<div class="text-center">
+			<div class="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
+			<p class="text-muted-foreground mt-2 text-sm">Loading...</p>
+		</div>
+	</div>
 {/if}
 ```
 
@@ -241,32 +241,32 @@ routes/
 
 ```svelte
 <script lang="ts">
-    import { authState } from '$lib/state/auth.svelte';
-    import { base } from '$app/paths';
-    import { goto } from '$app/navigation';
-    import { browser } from '$app/environment';
-    import { page } from '$app/stores';
+	import { authState } from '$lib/state/auth.svelte';
+	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 
-    let email = $state('');
-    let password = $state('');
+	let email = $state('');
+	let password = $state('');
 
-    // Redirect if already authenticated
-    $effect(() => {
-        if (browser && authState.isAuthenticated) {
-            // Check for return URL
-            const redirectTo = $page.url.searchParams.get('redirectTo');
-            goto(redirectTo || `${base}/home`);
-        }
-    });
+	// Redirect if already authenticated
+	$effect(() => {
+		if (browser && authState.isAuthenticated) {
+			// Check for return URL
+			const redirectTo = $page.url.searchParams.get('redirectTo');
+			goto(redirectTo || `${base}/home`);
+		}
+	});
 
-    async function handleLogin() {
-        try {
-            await authState.login(email, password);
-            // authState.login handles redirect
-        } catch (err) {
-            console.error('Login error:', err);
-        }
-    }
+	async function handleLogin() {
+		try {
+			await authState.login(email, password);
+			// authState.login handles redirect
+		} catch (err) {
+			console.error('Login error:', err);
+		}
+	}
 </script>
 
 <!-- Login form -->
@@ -285,15 +285,15 @@ import { authState } from '$lib/state/auth.svelte';
 export const ssr = false; // Disable SSR for client-side auth
 
 export const load: LayoutLoad = async () => {
-    if (browser) {
-        try {
-            // Attempt to restore session from cookie
-            await authState.fetchUser();
-        } catch {
-            // User not authenticated - this is expected
-        }
-    }
-    return {};
+	if (browser) {
+		try {
+			// Attempt to restore session from cookie
+			await authState.fetchUser();
+		} catch {
+			// User not authenticated - this is expected
+		}
+	}
+	return {};
 };
 ```
 
@@ -302,12 +302,12 @@ export const load: LayoutLoad = async () => {
 ```svelte
 <!-- routes/+layout.svelte -->
 <script lang="ts">
-    import '../app.css';
-    let { children } = $props();
+	import '../app.css';
+	let { children } = $props();
 </script>
 
 <main class="min-h-screen">
-    {@render children?.()}
+	{@render children?.()}
 </main>
 ```
 
@@ -352,75 +352,68 @@ cookie_transport = CookieTransport(
 
 ```svelte
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
-    import { Input } from '$lib/components/ui/input';
-    import { Label } from '$lib/components/ui/label';
-    import * as Card from '$lib/components/ui/card';
-    import { authState } from '$lib/state/auth.svelte';
-    import { base } from '$app/paths';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import * as Card from '$lib/components/ui/card';
+	import { authState } from '$lib/state/auth.svelte';
+	import { base } from '$app/paths';
 
-    let email = $state('');
-    let password = $state('');
+	let email = $state('');
+	let password = $state('');
 
-    async function handleLogin() {
-        try {
-            await authState.login(email, password);
-        } catch (err) {
-            console.error('Login error:', err);
-        }
-    }
+	async function handleLogin() {
+		try {
+			await authState.login(email, password);
+		} catch (err) {
+			console.error('Login error:', err);
+		}
+	}
 </script>
 
-<div class="flex min-h-svh items-center justify-center bg-muted p-6">
-    <div class="w-full max-w-sm">
-        <Card.Root>
-            <Card.Header>
-                <Card.Title class="text-2xl">Welcome back</Card.Title>
-                <Card.Description>
-                    Enter your email and password to sign in
-                </Card.Description>
-            </Card.Header>
-            <Card.Content>
-                <form on:submit|preventDefault={handleLogin} class="grid gap-4">
-                    <div class="grid gap-2">
-                        <Label for="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            bind:value={email}
-                            required
-                        />
-                    </div>
-                    <div class="grid gap-2">
-                        <Label for="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            bind:value={password}
-                            required
-                        />
-                    </div>
-                    {#if authState.error}
-                        <div class="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                            {authState.error}
-                        </div>
-                    {/if}
-                    <Button type="submit" class="w-full" disabled={authState.loading}>
-                        {authState.loading ? 'Signing in...' : 'Sign in'}
-                    </Button>
-                </form>
-            </Card.Content>
-            <Card.Footer>
-                <div class="text-muted-foreground text-center text-sm">
-                    Don't have an account?
-                    <a href="{base}/signup" class="hover:text-primary underline underline-offset-4">
-                        Sign up
-                    </a>
-                </div>
-            </Card.Footer>
-        </Card.Root>
-    </div>
+<div class="bg-muted flex min-h-svh items-center justify-center p-6">
+	<div class="w-full max-w-sm">
+		<Card.Root>
+			<Card.Header>
+				<Card.Title class="text-2xl">Welcome back</Card.Title>
+				<Card.Description>Enter your email and password to sign in</Card.Description>
+			</Card.Header>
+			<Card.Content>
+				<form on:submit|preventDefault={handleLogin} class="grid gap-4">
+					<div class="grid gap-2">
+						<Label for="email">Email</Label>
+						<Input
+							id="email"
+							type="email"
+							placeholder="you@example.com"
+							bind:value={email}
+							required
+						/>
+					</div>
+					<div class="grid gap-2">
+						<Label for="password">Password</Label>
+						<Input id="password" type="password" bind:value={password} required />
+					</div>
+					{#if authState.error}
+						<div class="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
+							{authState.error}
+						</div>
+					{/if}
+					<Button type="submit" class="w-full" disabled={authState.loading}>
+						{authState.loading ? 'Signing in...' : 'Sign in'}
+					</Button>
+				</form>
+			</Card.Content>
+			<Card.Footer>
+				<div class="text-muted-foreground text-center text-sm">
+					Don't have an account?
+					<a href="{base}/signup" class="hover:text-primary underline underline-offset-4">
+						Sign up
+					</a>
+				</div>
+			</Card.Footer>
+		</Card.Root>
+	</div>
 </div>
 ```
 
@@ -428,45 +421,43 @@ cookie_transport = CookieTransport(
 
 ```svelte
 <script lang="ts">
-    import { authState } from '$lib/state/auth.svelte';
-    import { Button } from '$lib/components/ui/button';
-    import * as Card from '$lib/components/ui/card';
+	import { authState } from '$lib/state/auth.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
 
-    async function handleLogout() {
-        try {
-            await authState.logout();
-        } catch (err) {
-            console.error('Logout error:', err);
-        }
-    }
+	async function handleLogout() {
+		try {
+			await authState.logout();
+		} catch (err) {
+			console.error('Logout error:', err);
+		}
+	}
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-muted p-6">
-    <Card.Root>
-        <Card.Header>
-            <Card.Title>Welcome!</Card.Title>
-            <Card.Description>You are logged in</Card.Description>
-        </Card.Header>
-        <Card.Content>
-            <div class="space-y-2">
-                <div class="flex justify-between">
-                    <span class="text-sm font-medium">Email:</span>
-                    <span class="text-sm">{authState.user?.email}</span>
-                </div>
-                {#if authState.user?.full_name}
-                    <div class="flex justify-between">
-                        <span class="text-sm font-medium">Name:</span>
-                        <span class="text-sm">{authState.user.full_name}</span>
-                    </div>
-                {/if}
-            </div>
-        </Card.Content>
-        <Card.Footer>
-            <Button variant="outline" class="w-full" onclick={handleLogout}>
-                Sign out
-            </Button>
-        </Card.Footer>
-    </Card.Root>
+<div class="bg-muted flex min-h-screen items-center justify-center p-6">
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Welcome!</Card.Title>
+			<Card.Description>You are logged in</Card.Description>
+		</Card.Header>
+		<Card.Content>
+			<div class="space-y-2">
+				<div class="flex justify-between">
+					<span class="text-sm font-medium">Email:</span>
+					<span class="text-sm">{authState.user?.email}</span>
+				</div>
+				{#if authState.user?.full_name}
+					<div class="flex justify-between">
+						<span class="text-sm font-medium">Name:</span>
+						<span class="text-sm">{authState.user.full_name}</span>
+					</div>
+				{/if}
+			</div>
+		</Card.Content>
+		<Card.Footer>
+			<Button variant="outline" class="w-full" onclick={handleLogout}>Sign out</Button>
+		</Card.Footer>
+	</Card.Root>
 </div>
 ```
 
@@ -479,6 +470,7 @@ Browser DevTools → Application → Cookies → Check for `auth-token`
 ### Network Tab
 
 Look for:
+
 - Login request sends credentials
 - Subsequent requests include cookie automatically
 - 401 responses redirect to login
@@ -487,11 +479,11 @@ Look for:
 
 ```typescript
 $effect(() => {
-    console.log('Auth state:', {
-        user: authState.user,
-        loading: authState.loading,
-        isAuthenticated: authState.isAuthenticated
-    });
+	console.log('Auth state:', {
+		user: authState.user,
+		loading: authState.loading,
+		isAuthenticated: authState.isAuthenticated
+	});
 });
 ```
 

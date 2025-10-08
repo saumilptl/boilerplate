@@ -73,9 +73,10 @@ class AuthState {
 			const user = await authApi.getCurrentUser();
 			this.user = user;
 			return user;
-		} catch {
+		} catch (error) {
+			console.error('Failed to fetch user:', error);
 			this.user = null;
-			return null;
+			throw error; // Throw to propagate to login()
 		} finally {
 			this.loading = false;
 		}
