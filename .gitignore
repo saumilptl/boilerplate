@@ -1,0 +1,25 @@
+# Docker
+dockerdata/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment (root level only)
+.env
+.env.*
+!.env.example
+
+# ngrok
+ngrok.yml

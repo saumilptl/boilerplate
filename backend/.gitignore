@@ -1,0 +1,151 @@
+#custom
+dockerdata/
+secrets/*.json
+!secrets/example.local.json
+vpn/.tmp/
+LICENSE
+twilio-cli.pkg
+autocomplete/
+
+# Celery Beat
+celerybeat-schedule
+celerybeat-schedule.db
+celerybeat.pid
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+docker_volumes/
+volumes/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+config/*.json
+ejson-keys
+pyrightconfig.json
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Pydantic
+*.pyd
+.pydantic/
+
+# Sphinx documentation
+docs/_build/
+docsrc/
+
+# PyCharm
+.idea/
+.idea/*
+
+# VS Code
+.vscode/
+.vscode/*
+
+# Zed
+.zed
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Miscellaneous
+*.log
+*.dat
+*.csv
+*.env
+*.config
+
+# Ignore all .env files
+.env.*
+
+# Ignore compiled library files
+*.lib
+*.dll
+*.dylib
+*.a
+*.la
+*.lo
+*.o
+*.obj
+
+# Ignore logs and databases
+*.log
+*.sqlite
+*.db
+
+.aider.*
+.aider*
+pyrightconfig.json
+scripts/teams_bot/setup-personal-dev-bot.sh
+scripts/generate_integration_key.py
+.ruff_cache

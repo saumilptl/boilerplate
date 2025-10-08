@@ -1,0 +1,100 @@
+# Root pre-commit configuration for monorepo
+default_language_version:
+  python: python3.12
+  node: system
+
+repos:
+  # General file checks (all files)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^.*\.(md|rst)$
+      - id: end-of-file-fixer
+        exclude: ^backend/secrets/.*\.json$
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-json
+        exclude: ^backend/secrets/.*\.json$
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: detect-private-key
+        exclude: ^backend/secrets/
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Backend: Python linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        name: ruff (backend)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
+        exclude: ^backend/(alembic/versions|tests)/
+      - id: ruff-format
+        name: ruff-format (backend)
+        files: ^backend/
+        exclude: ^backend/(alembic/versions|tests)/
+
+  # Backend: Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        name: bandit (backend)
+        args: ['-ll', '--skip', 'B101,B601']
+        files: ^backend/
+        exclude: ^backend/(tests|scripts|alembic)/
+
+  # Backend: Check for secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: detect-secrets (backend)
+        args: ['--baseline', 'backend/.secrets.baseline']
+        files: ^backend/
+        exclude: ^backend/(secrets/|.*\.lock$|poetry\.lock$)
+
+  # Backend: Validate pyproject.toml
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.23
+    hooks:
+      - id: validate-pyproject
+        name: validate-pyproject (backend)
+        files: ^backend/pyproject\.toml$
+
+  # Frontend: Prettier formatting (local hook using project dependencies)
+  - repo: local
+    hooks:
+      - id: prettier-frontend
+        name: prettier (frontend)
+        entry: bash -c 'cd frontend && npm run format'
+        language: system
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, svelte, json, css, scss, html]
+        pass_filenames: false
+
+      # Frontend: ESLint (local hook using project dependencies)
+      - id: eslint-frontend
+        name: eslint (frontend)
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/
+        types_or: [javascript, jsx, ts, tsx, svelte]
+        pass_filenames: false
+
+  # Conventional commit messages
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+# Configuration for specific stages
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]

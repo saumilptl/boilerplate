@@ -1,0 +1,253 @@
+[tool.poetry]
+name = "backend-boilerplate"
+version = "0.1.0"
+description = "Production-ready FastAPI backend boilerplate with async SQLAlchemy, Celery, and comprehensive monitoring"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "app"}]
+readme = "docs/README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+# Web Framework
+fastapi = {extras = ["standard"], version = "^0.115.0"}
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+gunicorn = "^23.0.0"
+
+# Database
+sqlmodel = "^0.0.22"
+sqlalchemy = "^2.0.36"
+alembic = "^1.14.0"
+asyncpg = "^0.30.0"
+psycopg2-binary = "^2.9.10"
+
+# Configuration & Settings
+pydantic = "^2.9.2"
+pydantic-settings = "^2.6.1"
+
+# Dependency Injection
+dependency-injector = "^4.45.0"
+
+# Caching & Message Broker
+redis = "^5.2.0"
+
+# Background Jobs
+celery = "^5.4.0"
+flower = "^2.0.1"
+
+# Monitoring & Observability
+structlog = "^24.4.0"
+opentelemetry-api = "^1.28.2"
+opentelemetry-sdk = "^1.28.2"
+opentelemetry-exporter-otlp = "^1.28.2"
+opentelemetry-instrumentation-fastapi = "^0.49b2"
+opentelemetry-instrumentation-sqlalchemy = "^0.49b2"
+opentelemetry-instrumentation-redis = "^0.49b2"
+ddtrace = "^2.17.3"
+
+# Security
+slowapi = "^0.1.9"
+argon2-cffi = "^23.1.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+cryptography = "^43.0.3"
+
+# Utilities
+pendulum = "^3.0.0"
+nanoid = "^2.0.0"
+greenlet = "^3.2.4"
+pyyaml = "^6.0.3"
+fastapi-users = {version = ">=13.0.0", extras = ["sqlalchemy"]}
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = "^8.3.4"
+pytest-asyncio = "^0.24.0"
+pytest-mock = "^3.14.0"
+pytest-cov = "^6.0.0"
+pytest-watch = "^4.2.0"
+pytest-sugar = "^1.0.0"
+httpx = "^0.28.1"
+factory-boy = "^3.3.1"
+polyfactory = "^2.17.0"
+
+# Code Quality
+ruff = "^0.8.4"
+mypy = "^1.13.0"
+pre-commit = "^4.0.1"
+
+# CLI
+typer = {extras = ["all"], version = "^0.15.1"}
+rich = "^13.9.4"
+watchdog = {extras = ["watchmedo"], version = "^6.0.0"}
+psutil = "^6.1.1"
+
+# Task Runner
+poethepoet = "^0.31.1"
+
+[tool.poetry.scripts]
+# Secrets Management
+setup-ejson = "scripts.secrets.setup_ejson:main"
+encrypt-ejson = "scripts.secrets.encrypt_ejson:main"
+decrypt-ejson = "scripts.secrets.decrypt_ejson:main"
+load-env = "scripts.secrets.load_env:main"
+
+[tool.poe.tasks]
+# Development Server
+serve = {cmd = "python -m scripts.commands.serve"}
+
+# Database Migrations
+migration-generate = {cmd = "python -m scripts.database.migrations generate"}
+migration-upgrade = {cmd = "python -m scripts.database.migrations upgrade"}
+migration-downgrade = {cmd = "python -m scripts.database.migrations downgrade"}
+migration-history = {cmd = "python -m scripts.database.migrations history"}
+
+# Database Seeding
+seed-list = {cmd = "python -m scripts.database.seeder list"}
+seed-run = {cmd = "python -m scripts.database.seeder run"}
+seed-init = {cmd = "python -m scripts.database.seeder init"}
+
+# Testing
+test-unit = {cmd = "pytest -m unit"}
+test-integration = {cmd = "pytest -m integration"}
+test-e2e = {cmd = "pytest -m e2e"}
+test-smoke = {cmd = "pytest -m smoke"}
+test-all = {cmd = "pytest"}
+test-coverage = {cmd = "pytest --cov=app --cov-report=term-missing:skip-covered --cov-report=html"}
+test-watch = {cmd = "pytest-watch -- -m unit"}
+
+# Code Quality
+lint = {cmd = "ruff check ."}
+lint-fix = {cmd = "ruff check --fix ."}
+format = {cmd = "ruff format ."}
+type-check = {cmd = "mypy app"}
+quality = {shell = "ruff check . && ruff format --check . && mypy app"}
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+# Exclude paths
+exclude = [
+    "alembic/versions",
+    "tests",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+# Select additional rule sets for comprehensive checking
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
+    "SIM",  # flake8-simplify
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "TC",   # flake8-type-checking
+    "ERA",  # flake8-eradicate (commented code)
+    "PGH",  # pygrep-hooks
+    "RUF",  # Ruff-specific rules
+    "TRY",  # tryceratops (exception handling)
+    "FLY",  # flynt (string formatting)
+    "PERF", # performance anti-patterns
+    "LOG",  # flake8-logging
+    "C90",  # McCabe complexity
+]
+
+# Ignore specific rules that may be too strict
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # function calls in argument defaults
+    "RET504", # unnecessary assignment before return
+    "TRY003", # long exception messages
+    "TRY300", # consider moving to else block (conflicts with RET505)
+    "TC001",  # move import into type-checking block
+    "TC002",  # move import into type-checking block
+    "TC003",  # move import into type-checking block
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ARG001", "ARG002", "PT004", "PT011", "C90"]  # Tests can be complex
+"app/worker/tasks/*.py" = ["ARG001"]  # Celery tasks often have unused args
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10  # Functions with complexity > 10 need refactoring
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "dependency_injector.*",
+    "slowapi.*",
+    "ddtrace.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests/suite"]
+python_files = ["test_*.py"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--asyncio-mode=auto",
+    "--tb=short",
+    "--cov-report=term-missing:skip-covered",
+]
+markers = [
+    "unit: Fast tests with no external dependencies",
+    "integration: Tests requiring database or external services",
+    "e2e: End-to-end user flow tests",
+    "smoke: Critical tests for quick validation",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/alembic/*",
+    "*/scripts/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,11 @@
+# Dependencies
+node_modules
+
+# SvelteKit
+/.svelte-kit
+/build
+/package
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

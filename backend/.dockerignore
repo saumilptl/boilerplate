@@ -1,0 +1,43 @@
+#custom
+dockerdata/
+secrets/*.json
+!secrets/example.local.json
+vpn/
+
+# Ignore Python cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.whl
+*.egg
+*.egg-info
+
+# Ignore virtual environment directories
+venv/
+.env/
+env/
+.virtualenv/
+.venv/
+
+# Ignore Git and other VCS directories
+.git/
+.gitignore
+
+# Ignore test and coverage results
+tests/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+.nox/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore the .github directory
+.github/

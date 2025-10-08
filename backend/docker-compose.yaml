@@ -1,0 +1,207 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: backend-postgres
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: app_db
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./scripts/database/entrypoint:/docker-entrypoint-initdb.d
+      - ./dockerdata/postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend-network
+
+  # Redis Cache & Message Broker
+  redis:
+    image: redis:7-alpine
+    container_name: backend-redis
+    command: redis-server --appendonly yes --requirepass redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./dockerdata/redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - backend-network
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    container_name: backend-api
+    working_dir: /app/src
+    volumes:
+      - .:/app/src
+      - ./dockerdata/poetry-cache:/root/.cache/pypoetry
+    environment:
+      - ENVIRONMENT=development
+      - SERVICE_NAME=backend-api
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - EJSON_PUBLIC_KEY=6256bbbb216566dd58f2469d75e480b04793191064ab19c5cb8046c012a1fc25
+      - EJSON_PRIVATE_KEY=02656c1694ded4f36048115b53f4b32087a817b3339e3fe1c025b6a312313dee
+      - DEBUG=1
+      - DATABASE__HOST=postgres
+      - DATABASE__PORT=5432
+      - REDIS__HOST=redis
+      - REDIS__PORT=6379
+    entrypoint: ["sh", "-c"]
+    command: ["./scripts/docker/api.entrypoint.sh"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Celery Worker
+  worker:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    container_name: backend-worker
+    working_dir: /app/src
+    volumes:
+      - .:/app/src
+      - ./dockerdata/poetry-cache:/root/.cache/pypoetry
+    environment:
+      - ENVIRONMENT=development
+      - SERVICE_NAME=backend-worker
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - EJSON_PUBLIC_KEY=6256bbbb216566dd58f2469d75e480b04793191064ab19c5cb8046c012a1fc25
+      - EJSON_PRIVATE_KEY=02656c1694ded4f36048115b53f4b32087a817b3339e3fe1c025b6a312313dee
+      - RUN_CELERY_BEAT=true
+      - DEBUG=1
+      - DATABASE__HOST=postgres
+      - DATABASE__PORT=5432
+      - REDIS__HOST=redis
+      - REDIS__PORT=6379
+    entrypoint: ["sh", "-c"]
+    command: ["./scripts/docker/worker.entrypoint.sh"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "celery", "-A", "app.worker.app", "inspect", "ping", "-d", "celery@worker"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Celery Beat Scheduler (Optional)
+  beat:
+    build:
+      context: .
+      target: worker
+    container_name: backend-beat
+    command: ["beat"]
+    environment:
+      # Application
+      ENVIRONMENT: development
+      SERVICE_NAME: backend-beat
+      DEBUG: "true"
+      # ENV_ prefixed vars override secrets files (for Docker-specific config)
+      ENV_DATABASE__HOST: postgres
+      ENV_DATABASE__PORT: 5432
+      ENV_DATABASE__USER: app
+      ENV_DATABASE__PASSWORD: app_password
+      ENV_DATABASE__NAME: app_db
+      ENV_REDIS__HOST: redis
+      ENV_REDIS__PORT: 6379
+      ENV_REDIS__PASSWORD: redis_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend-network
+    restart: unless-stopped
+    profiles:
+      - with-beat
+
+  # Flower - Celery Monitoring
+  flower:
+    build:
+      context: .
+      target: worker
+    container_name: backend-flower
+    command: ["flower"]
+    environment:
+      # ENV_ prefixed vars override secrets files (for Docker-specific config)
+      ENV_REDIS__HOST: redis
+      ENV_REDIS__PORT: 6379
+      FLOWER_PORT: 5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend-network
+    restart: unless-stopped
+    profiles:
+      - with-monitoring
+
+  # Datadog Agent (Optional for production monitoring)
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: backend-datadog
+    environment:
+      DD_API_KEY: ${DD_API_KEY:-}
+      DD_SITE: datadoghq.com
+      DD_APM_ENABLED: "true"
+      DD_APM_NON_LOCAL_TRAFFIC: "true"
+      DD_LOGS_ENABLED: "true"
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
+      DD_PROCESS_AGENT_ENABLED: "true"
+      DD_DOCKER_LABELS_AS_TAGS: '{"*":"%%label%%"}'
+      DD_TAGS: 'env:development service:backend-api'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    ports:
+      - "8126:8126/tcp"  # APM traces
+    networks:
+      - backend-network
+    restart: unless-stopped
+    profiles:
+      - with-monitoring
+
+networks:
+  backend-network:
+    driver: bridge

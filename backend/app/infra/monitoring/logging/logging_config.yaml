@@ -1,0 +1,52 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  standard:
+    format: "%(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: standard
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: standard
+    filename: /var/log/app/app.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 50
+
+loggers:
+  uvicorn:
+    handlers: [console, file]
+    propagate: False
+
+  app:
+    handlers: [console, file]
+    propagate: False
+
+  # Celery logger configuration to reduce verbosity
+  celery.app.trace:
+    level: WARNING  # Suppresses "Task succeeded" messages
+    handlers: [console, file]
+    propagate: False
+
+  celery.worker.strategy:
+    level: WARNING  # Suppresses "Task received" messages
+    handlers: [console, file]
+    propagate: False
+
+  celery.worker.autoscaler:
+    level: WARNING  # Suppresses "Scaling up/down" messages
+    handlers: [console, file]
+    propagate: False
+
+  celery.beat:
+    level: WARNING  # Suppress "Sending due task" messages
+    handlers: [console, file]
+    propagate: False
+
+root:
+  handlers: [console, file]

@@ -1,0 +1,17 @@
+:8080 {
+	# API routes - strip /api prefix and proxy to backend
+	handle /api/* {
+		uri strip_prefix /api
+		reverse_proxy api:8000
+	}
+
+	# App routes go to frontend
+	handle /app/* {
+		reverse_proxy frontend:5173
+	}
+
+	# Root redirects to /app
+	handle / {
+		redir /app 302
+	}
+}
